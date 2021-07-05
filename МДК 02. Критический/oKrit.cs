@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace МДК_02.Критический
 {
-    class oKrit
+   public class oKrit
     {
-        string str = "";
+        public string str = "";
         /// <summary>
         /// пути + продолжительность (дни по условию задачи)
         /// </summary>
@@ -249,7 +249,7 @@ namespace МДК_02.Критический
                 return LBr[1];
             }
         }
-        public void vivod(List<List<ofPP>> LPathFunc, int maxind, int max)
+        public bool vivod(List<List<ofPP>> LPathFunc, int maxind, int max)
         {
             try
             {
@@ -262,11 +262,13 @@ namespace МДК_02.Критический
                     sr.WriteLine("Длина " + max);
                 }
                 Debug.WriteLine("Удачное завершение кода |" + DateTime.Now + "|");
+                return true;
             }
             catch (Exception e)
             {
                 Debug.WriteLine("Экстренное завершение программы. Ошибка в модуле записи в файл: " + e.Message);
                 Environment.Exit(404);
+                return false;
             }
         }
     }
