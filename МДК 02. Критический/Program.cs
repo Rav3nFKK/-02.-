@@ -12,7 +12,7 @@ namespace МДК_02.Критический
     {
         static void Main(string[] args)
         {
-            Debug.Listeners.Add(new TextWriterTraceListener(File.Create("LogOFCrit.txt")));
+            Debug.Listeners.Add(new TextWriterTraceListener(File.AppendText("LogOFCrit.txt")));
             Debug.AutoFlush = true;
 
             oKrit krit = new oKrit();

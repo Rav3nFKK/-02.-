@@ -31,38 +31,48 @@ namespace МДК_02.Критический
         /// </summary>
         public void Reshenie()
         {
-            List<ofPP> Lway; //пути
-            List<ofPP> Stq = Vvod(); //
-            Lway = Stq.FindAll(x => x.punkt1 == Stq[MinElem(Stq)].punkt1);
-            List<List<ofPP>> LwayPunkt = new List<List<ofPP>>();
-            foreach (ofPP rb in Lway)//построение путей из начальных возможных перемещений
+            Debug.WriteLine("\n\nЗапуск обработки |" + DateTime.Now + "|");
+            try
             {
-                CreatePath(Stq, rb);//Построение пути
-                LwayPunkt.Add(Branches(Stq, str));//Построение ветвей
-                str = "";
-            }
+                List<ofPP> Lway; //пути
+                List<ofPP> Stq = Vvod(); //
+                Lway = Stq.FindAll(x => x.punkt1 == Stq[MinElem(Stq)].punkt1);
+                List<List<ofPP>> LwayPunkt = new List<List<ofPP>>();
+                foreach (ofPP rb in Lway)//построение путей из начальных возможных перемещений
+                {
+                    CreatePath(Stq, rb);//Построение пути
+                    LwayPunkt.Add(Branches(Stq, str));//Построение ветвей
+                    str = "";
+                }
 
-            Debug.WriteLine("Все пути: ");
-            for (int i = 0; i < LwayPunkt.Count; i++)
-            {
-                foreach (ofPP path in LwayPunkt[i])
+                Debug.WriteLine("Все пути: ");
+                for (int i = 0; i < LwayPunkt.Count; i++)
                 {
-                    Debug.Write(path.punkt1 + " - " + path.punkt2 + ";(" + path.dlina + ") ");
+                    foreach (ofPP path in LwayPunkt[i])
+                    {
+                        Debug.Write(path.punkt1 + " - " + path.punkt2 + ";(" + path.dlina + ") ");
+                    }
+                    Debug.WriteLine("");
                 }
-                Debug.WriteLine("");
-            }
-            int max = LwayPunkt[0][0].dlina, maxind = 0;
-            for (int i = 0; i < Lway.Count; i++)// подсчет стоимости путей
-            {
-                if (Dl(LwayPunkt[i]) >= max)// выбор самого большого
+                int max = LwayPunkt[0][0].dlina, maxind = 0;
+                for (int i = 0; i < Lway.Count; i++)// подсчет стоимости путей
                 {
-                    max = Dl(LwayPunkt[i]);
-                    maxind = i;
+                    if (Dl(LwayPunkt[i]) >= max)// выбор самого большого
+                    {
+                        max = Dl(LwayPunkt[i]);
+                        maxind = i;
+                    }
                 }
+                Debug.WriteLine("Критический путь займет: " + max + " день(ей)");
+
+                vivod(LwayPunkt, maxind, max);
             }
-            vivod(LwayPunkt, maxind, max);
+            catch (Exception e)
+            {
+                Debug.WriteLine("Экстренное завершение программы. Ошибка в модуле решения: " + e.Message);
+                Environment.Exit(404);
+            }
         }
-        //!check
         /// <summary>
         /// Метод считывания из файла
         /// </summary>
@@ -70,18 +80,28 @@ namespace МДК_02.Критический
         public List<ofPP> Vvod()
         {
             List<ofPP> l = new List<ofPP>();
-            using (StreamReader sr = new StreamReader("Vvod.csv"))
+            try
             {
-                while (sr.EndOfStream != true)
+                using (StreamReader sr = new StreamReader("Vvod.csv"))
                 {
-                    string[] count1 = sr.ReadLine().Split(';');
-                    string[] count2 = count1[0].Split('-');
-                    //Debug.WriteLine(count2[0] + " - " + count2[1] + "; " + count1[1]);
-                    l.Add(new ofPP { punkt1 = Convert.ToInt32(count2[0]), punkt2 = Convert.ToInt32(count2[1]), dlina = Convert.ToInt32(count1[1]) });
-                }
+                    Debug.WriteLine("Входные данные: ");
+                    while (sr.EndOfStream != true)
+                    {
+                        string[] count1 = sr.ReadLine().Split(';');
+                        string[] count2 = count1[0].Split('-');
+                        Debug.WriteLine(count2[0] + " - " + count2[1] + "");
+                        l.Add(new ofPP { punkt1 = Convert.ToInt32(count2[0]), punkt2 = Convert.ToInt32(count2[1]), dlina = Convert.ToInt32(count1[1]) });
+                    }
 
+                }
+                return l;
             }
-            return l;
+            catch (Exception e)
+            {
+                Debug.WriteLine("Экстренное завершение программы. Ошибка в модуле считывания с файла: " + e.Message);
+                Environment.Exit(404);
+                return l;
+            }
         }
         /// <summary>
         /// Построение всех возможных путей
@@ -92,49 +112,39 @@ namespace МДК_02.Критический
         public int CreatePath(List<ofPP> StQ, ofPP minel)
 
         {
-
-            int dlina = 0;
-
-            ofPP MoveVar = StQ.Find(x => x.punkt1 == minel.punkt1 && x.punkt2 == minel.punkt2);//Поиск возможных вариантов передвижения
-
-            str += MoveVar.punkt1.ToString() + "-" + MoveVar.punkt2.ToString();//Пишем передвижение
-
-            if (MoveVar.punkt2 == StQ[MaxElem(StQ)].punkt2)//Смотрим не в конце ли мы
-
+            try
             {
-
-                str += ";";
-
-                return MoveVar.dlina;
-
-            }
-
-            else
-
-            {
-
-                for (int i = 0; i < StQ.Count; i++)//Ищем стоимость перемещения в ту точку в которую мы пришли
-
+                int dlina = 0;
+                ofPP MoveVar = StQ.Find(x => x.punkt1 == minel.punkt1 && x.punkt2 == minel.punkt2);//Поиск возможных вариантов передвижения
+                str += MoveVar.punkt1.ToString() + "-" + MoveVar.punkt2.ToString();//Пишем передвижение
+                if (MoveVar.punkt2 == StQ[MaxElem(StQ)].punkt2)//Смотрим не в конце ли мы
                 {
-
-                    if (StQ[i].punkt1 == MoveVar.punkt2)
-
-                    {
-
-                        str += ",";
-
-                        dlina = CreatePath(StQ, StQ[i]) + MoveVar.dlina;
-
-                    }
-
+                    str += ";";
+                    return MoveVar.dlina;
                 }
-
+                else
+                {
+                    for (int i = 0; i < StQ.Count; i++)//Ищем стоимость перемещения в ту точку в которую мы пришли
+                    {
+                        if (StQ[i].punkt1 == MoveVar.punkt2)
+                        {
+                            str += ",";
+                            dlina = CreatePath(StQ, StQ[i]) + MoveVar.dlina;
+                        }
+                    }
+                }
+                return dlina;
             }
-
-            return dlina;
+            catch (Exception e)
+            {
+                Debug.WriteLine("Экстренное завершение программы. Ошибка в модуле построения путей: " + e.Message);
+                Environment.Exit(404);
+                return 1;
+            }
         }
+
         /// <summary>
-        /// Поиск конечной точки (берем )
+        /// Поиск конечной точки (берем максимальный элемент входящего столбца, которого нет в исходящем)
         /// </summary>
         /// <param name="StQ">Лист значений</param>
         /// <returns></returns>
@@ -189,56 +199,74 @@ namespace МДК_02.Критический
         public List<ofPP> Branches(List<ofPP> StQ, string s)
         {
             List<List<ofPP>> LBr = new List<List<ofPP>>();
-            string[] s1 = s.Split(';');
-            foreach (string st1 in s1)
+            try
             {
-                if (st1 != "")
+                string[] s1 = s.Split(';');
+                foreach (string st1 in s1)
                 {
-                    LBr.Add(new List<ofPP>());
-                    string[] s2 = st1.Split(',');
-                    foreach (string str2 in s2)
+                    if (st1 != "")
                     {
-                        if (str2 != "")
+                        LBr.Add(new List<ofPP>());
+                        string[] s2 = st1.Split(',');
+                        foreach (string str2 in s2)
                         {
-                            string[] str3 = str2.Split('-');
-                            LBr[LBr.Count - 1].Add(StQ.Find(x => x.punkt1 == Convert.ToInt32(str3[0]) && x.punkt2 == Convert.ToInt32(str3[1])));
+                            if (str2 != "")
+                            {
+                                string[] str3 = str2.Split('-');
+                                LBr[LBr.Count - 1].Add(StQ.Find(x => x.punkt1 == Convert.ToInt32(str3[0]) && x.punkt2 == Convert.ToInt32(str3[1])));
+                            }
                         }
                     }
                 }
-            }
-            foreach (List<ofPP> l in LBr)
-            {
-                if (l[0].punkt1 != StQ[MinElem(StQ)].punkt1)
+                foreach (List<ofPP> l in LBr)
                 {
-                    foreach (List<ofPP> l1 in LBr)
+                    if (l[0].punkt1 != StQ[MinElem(StQ)].punkt1)
                     {
-                        if (l1[0].punkt1 == StQ[MinElem(StQ)].punkt1)
+                        foreach (List<ofPP> l1 in LBr)
                         {
-                            l.InsertRange(0, l1.FindAll(x => l1.IndexOf(x) <= l1.FindIndex(y => y.punkt2 == l[0].punkt1)));
+                            if (l1[0].punkt1 == StQ[MinElem(StQ)].punkt1)
+                            {
+                                l.InsertRange(0, l1.FindAll(x => l1.IndexOf(x) <= l1.FindIndex(y => y.punkt2 == l[0].punkt1)));
+                            }
                         }
                     }
                 }
-            }
-            int max = LBr[0][0].dlina, maxind = 0;
-            for (int i = 0; i < LBr.Count; i++)
-            {
-                if (Dl(LBr[i]) >= max)
+                int max = LBr[0][0].dlina, maxind = 0;
+                for (int i = 0; i < LBr.Count; i++)
                 {
-                    max = Dl(LBr[i]);
-                    maxind = i;
+                    if (Dl(LBr[i]) >= max)
+                    {
+                        max = Dl(LBr[i]);
+                        maxind = i;
+                    }
                 }
+                return LBr[maxind];
             }
-            return LBr[maxind];
+            catch (Exception e)
+            {
+                Debug.WriteLine("Экстренное завершение программы. Ошибка в модуле построения ветвления: " + e.Message);
+                Environment.Exit(404);
+                return LBr[1];
+            }
         }
         public void vivod(List<List<ofPP>> LPathFunc, int maxind, int max)
         {
-            using (StreamWriter sr = new StreamWriter(@"Вывод.csv", false, Encoding.Default, 10))
+            try
             {
-                foreach (ofPP Path in LPathFunc[maxind])
+                using (StreamWriter sr = new StreamWriter(@"Вывод.csv", false, Encoding.Default, 10))
                 {
-                    sr.Write(Path.punkt1 + " - " + Path.punkt2 + ";(" + Path.dlina + ") ");
+                    foreach (ofPP Path in LPathFunc[maxind])
+                    {
+                        sr.Write(Path.punkt1 + " - " + Path.punkt2 + ";(" + Path.dlina + ") ");
+                    }
+                    sr.WriteLine("Длина " + max);
                 }
-                sr.WriteLine("Длина " + max);
+                Debug.WriteLine("Удачное завершение кода |" + DateTime.Now + "|");
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine("Экстренное завершение программы. Ошибка в модуле записи в файл: " + e.Message);
+                Environment.Exit(404);
             }
         }
     }
