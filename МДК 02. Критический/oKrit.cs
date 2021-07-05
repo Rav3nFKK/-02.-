@@ -26,7 +26,6 @@ namespace МДК_02.Критический
             }
 
         }
-
         /// <summary>
         /// Модуль решения (вложенный вызов методов)
         /// </summary>
@@ -39,7 +38,7 @@ namespace МДК_02.Критический
             foreach (ofPP rb in Lway)//построение путей из начальных возможных перемещений
             {
                 CreatePath(Stq, rb);//Построение пути
-              ///  LwayPunkt.Add(Branches(StQ, s));//Построение ветвей
+                LwayPunkt.Add(Branches(Stq, str));//Построение ветвей
                 str = "";
             }
 
@@ -61,11 +60,8 @@ namespace МДК_02.Критический
                     maxind = i;
                 }
             }
-           
-        //    vivod(LPathFunc, maxind, max);
-            Debug.Listeners.Clear();
+            vivod(LwayPunkt, maxind, max);
         }
-
         //!check
         /// <summary>
         /// Метод считывания из файла
@@ -190,6 +186,60 @@ namespace МДК_02.Критический
             }
             return LN;
         }
-
+        public List<ofPP> Branches(List<ofPP> StQ, string s)
+        {
+            List<List<ofPP>> LBr = new List<List<ofPP>>();
+            string[] s1 = s.Split(';');
+            foreach (string st1 in s1)
+            {
+                if (st1 != "")
+                {
+                    LBr.Add(new List<ofPP>());
+                    string[] s2 = st1.Split(',');
+                    foreach (string str2 in s2)
+                    {
+                        if (str2 != "")
+                        {
+                            string[] str3 = str2.Split('-');
+                            LBr[LBr.Count - 1].Add(StQ.Find(x => x.punkt1 == Convert.ToInt32(str3[0]) && x.punkt2 == Convert.ToInt32(str3[1])));
+                        }
+                    }
+                }
+            }
+            foreach (List<ofPP> l in LBr)
+            {
+                if (l[0].punkt1 != StQ[MinElem(StQ)].punkt1)
+                {
+                    foreach (List<ofPP> l1 in LBr)
+                    {
+                        if (l1[0].punkt1 == StQ[MinElem(StQ)].punkt1)
+                        {
+                            l.InsertRange(0, l1.FindAll(x => l1.IndexOf(x) <= l1.FindIndex(y => y.punkt2 == l[0].punkt1)));
+                        }
+                    }
+                }
+            }
+            int max = LBr[0][0].dlina, maxind = 0;
+            for (int i = 0; i < LBr.Count; i++)
+            {
+                if (Dl(LBr[i]) >= max)
+                {
+                    max = Dl(LBr[i]);
+                    maxind = i;
+                }
+            }
+            return LBr[maxind];
+        }
+        public void vivod(List<List<ofPP>> LPathFunc, int maxind, int max)
+        {
+            using (StreamWriter sr = new StreamWriter(@"Вывод.csv", false, Encoding.Default, 10))
+            {
+                foreach (ofPP Path in LPathFunc[maxind])
+                {
+                    sr.Write(Path.punkt1 + " - " + Path.punkt2 + ";(" + Path.dlina + ") ");
+                }
+                sr.WriteLine("Длина " + max);
+            }
+        }
     }
 }
