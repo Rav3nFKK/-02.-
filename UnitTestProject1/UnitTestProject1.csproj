@@ -54,6 +54,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="Properties\Шабанин_Диаграммы.pdf" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\МДК 02. Критический\МДК 02. Критический.csproj">
