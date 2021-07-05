@@ -27,10 +27,43 @@ namespace МДК_02.Критический
 
         }
 
+        /// <summary>
+        /// Модуль решения (вложенный вызов методов)
+        /// </summary>
         public void Reshenie()
         {
-            Vvod();
+            List<ofPP> Lway; //пути
+            List<ofPP> Stq = Vvod(); //
+            Lway = Stq.FindAll(x => x.punkt1 == Stq[MinElem(Stq)].punkt1);
+            List<List<ofPP>> LwayPunkt = new List<List<ofPP>>();
+            foreach (ofPP rb in Lway)//построение путей из начальных возможных перемещений
+            {
+                CreatePath(Stq, rb);//Построение пути
+              ///  LwayPunkt.Add(Branches(StQ, s));//Построение ветвей
+                str = "";
+            }
 
+            Debug.WriteLine("Все пути: ");
+            for (int i = 0; i < LwayPunkt.Count; i++)
+            {
+                foreach (ofPP path in LwayPunkt[i])
+                {
+                    Debug.Write(path.punkt1 + " - " + path.punkt2 + ";(" + path.dlina + ") ");
+                }
+                Debug.WriteLine("");
+            }
+            int max = LwayPunkt[0][0].dlina, maxind = 0;
+            for (int i = 0; i < Lway.Count; i++)// подсчет стоимости путей
+            {
+                if (Dl(LwayPunkt[i]) >= max)// выбор самого большого
+                {
+                    max = Dl(LwayPunkt[i]);
+                    maxind = i;
+                }
+            }
+           
+        //    vivod(LPathFunc, maxind, max);
+            Debug.Listeners.Clear();
         }
 
         //!check
@@ -54,21 +87,6 @@ namespace МДК_02.Критический
             }
             return l;
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         /// <summary>
         /// Построение всех возможных путей
         /// </summary>
@@ -119,8 +137,6 @@ namespace МДК_02.Критический
 
             return dlina;
         }
-
-
         /// <summary>
         /// Поиск конечной точки (берем )
         /// </summary>
@@ -139,7 +155,6 @@ namespace МДК_02.Критический
             }
             return MaxId;
         }
-
         /// <summary>
         /// Поиск начальной точки (Смотрим минимальный элемент исходящего столбца, которого нет в столбце прибытия)
         /// </summary>
@@ -158,6 +173,22 @@ namespace МДК_02.Критический
                 }
             }
             return MinId;
+        }
+        /// <summary>
+        /// Длина путей
+        /// </summary>
+        /// <param name="StQ"></param>
+        /// <returns></returns>
+        public int Dl(List<ofPP> StQ)
+
+        {
+            int LN = 0;
+            foreach (ofPP rb in StQ)
+
+            {
+                LN += rb.dlina;
+            }
+            return LN;
         }
 
     }
